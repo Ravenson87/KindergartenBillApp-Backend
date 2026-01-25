@@ -1,0 +1,13 @@
+package com.example.KindergartenBillApp;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.context.SpringBootTest;
+
+@SpringBootTest
+class KindergartenBillAppApplicationTests {
+
+	@Test
+	void contextLoads() {
+	}
+
+}
