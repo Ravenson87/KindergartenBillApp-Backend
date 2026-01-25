@@ -1,6 +1,8 @@
 # KindergartenBillApp BACKEND🧾
 
-KindergartenBillApp backend is a Spring Boot application designed to manage kindergarten billing. It allows administrators to record, update, and track monthly bills for children, providing a reliable system for managing payments and generating reports.
+KindergartenBillApp backend is a Spring Boot application designed to manage kindergarten billing. 
+It allows administrators to record, update, and track monthly bills for children, 
+providing a reliable system for managing payments and generating reports.
 
 ✨ Main features include:
 - Creating and updating child accounts
