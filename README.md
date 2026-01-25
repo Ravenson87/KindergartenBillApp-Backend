@@ -35,6 +35,7 @@ KindergartenBillAppBack/
 └── README.md                        # Documentation for backend
 ```
 👤 Author
-Gavrić Siniša
+
+Siniša Gavrić
 
 GitHub: github.com/Ravenson87
