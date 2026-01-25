@@ -36,6 +36,6 @@ KindergartenBillAppBack/
 ```
 👤 Author
 
-Siniša Gavrić
+- Siniša Gavrić
 
-GitHub: github.com/Ravenson87
+- GitHub: github.com/Ravenson87
