@@ -2,6 +2,7 @@ package com.example.KindergartenBillApp.administration.model;
 
 import com.example.KindergartenBillApp.sharedTools.models.Auditable;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -54,6 +55,13 @@ public class KindergartenAccount extends Auditable implements Serializable {
     @JsonProperty("activity_code")
     @Column(name = "activity_code")
     private Integer activityCode;
+
+    @NotNull(message = "kindergarten id can not be null")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "kindergarten_id", referencedColumnName = "id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ToString.Exclude
+    private Kindergarten kindergarten;
 
 
 }

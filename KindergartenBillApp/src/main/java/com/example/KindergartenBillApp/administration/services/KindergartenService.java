@@ -2,9 +2,7 @@ package com.example.KindergartenBillApp.administration.services;
 
 import com.example.KindergartenBillApp.administration.model.Group;
 import com.example.KindergartenBillApp.administration.model.Kindergarten;
-import com.example.KindergartenBillApp.administration.model.KindergartenAccount;
 import com.example.KindergartenBillApp.administration.repository.GroupRepository;
-import com.example.KindergartenBillApp.administration.repository.KindergartenAccountRepository;
 import com.example.KindergartenBillApp.administration.repository.KindergartenRepository;
 import com.example.KindergartenBillApp.sharedTools.exceptions.ApiExceptions;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ import java.util.Set;
 public class KindergartenService {
 
     private final KindergartenRepository kindergartenRepository;
-    private final KindergartenAccountRepository kindergartenAccountRepository;
     private final GroupRepository groupRepository;
 
     /**
@@ -35,14 +32,6 @@ public class KindergartenService {
      * @return the saved Kindergarten entity
      */
     public Kindergarten create(Kindergarten model){
-        if(model.getAccount()==null || model.getAccount().getId()==null){
-            throw new ApiExceptions("Account id must be provided", HttpStatus.BAD_REQUEST);
-        }
-
-        Integer accountId = model.getAccount().getId();
-        KindergartenAccount account = kindergartenAccountRepository.findById(accountId)
-                .orElseThrow(()-> new ApiExceptions("Kindergarten account with id = " + accountId + " not found", HttpStatus.NOT_FOUND));
-
         if(kindergartenRepository.existsByName(model.getName())){
             throw new ApiExceptions("Kindergarten with name " + model.getName() + " already exists", HttpStatus.CONFLICT);
         }
@@ -51,7 +40,6 @@ public class KindergartenService {
             throw new ApiExceptions("Kindergarten with email " + model.getEmail() + " already exists", HttpStatus.CONFLICT);
         }
 
-        model.setAccount(account);
         return kindergartenRepository.save(model);
     }
 
@@ -119,11 +107,6 @@ public class KindergartenService {
         Kindergarten existing = kindergartenRepository.findById(id)
                 .orElseThrow(()-> new ApiExceptions("Kindergarten with id = " + id + " not found", HttpStatus.NOT_FOUND));
 
-        if (model.getAccount() != null && model.getAccount().getId() != null){
-            KindergartenAccount account = kindergartenAccountRepository.findById(model.getAccount().getId())
-                    .orElseThrow(()-> new ApiExceptions("Kindergarten account with id = " + model.getAccount().getId() + " not found", HttpStatus.NOT_FOUND));
-            existing.setAccount(account);
-        }
 
         if(model.getName()!=null
                 && !model.getName().equals(existing.getName())
@@ -182,6 +165,7 @@ public class KindergartenService {
      */
     @Transactional
     public Kindergarten addGroupsToKindergarten(Integer kindergartenId, Set<Integer> groupIds){
+        //TODO Ubaci proveru za unique constraint koji je (kindergarten_id, group_id)
         Kindergarten kindergarten = kindergartenRepository.findById(kindergartenId)
                 .orElseThrow(()-> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
         Set<Group> groups = new HashSet<>();

@@ -6,12 +6,15 @@ CREATE TABLE `kindergarten_account`
     `pib` VARCHAR(9) NOT NULL,
     `identification_number` VARCHAR(50) NOT NULL,
     `activity_code` INT(11),
+    `kindergarten_id` INT(11) NOT NULL,
     `created_by`         VARCHAR(255)   DEFAULT NULL,
     `last_modified_by`   VARCHAR(255)   DEFAULT NULL,
     `created_date`       DATETIME      DEFAULT NULL,
     `last_modified_date` DATETIME      DEFAULT NULL,
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `account_number_uq` (`account_number`) USING BTREE,
-    UNIQUE KEY `identification_number_uq` (`identification_number`) USING BTREE
+    UNIQUE KEY `identification_number_uq` (`identification_number`) USING BTREE,
+    CONSTRAINT `fk_kindergarten_name` FOREIGN KEY (`kindergarten_id`) REFERENCES kindergarten(`id`)
+        ON UPDATE CASCADE ON DELETE NO ACTION
 
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci ROW_FORMAT = DYNAMIC;

@@ -4,8 +4,8 @@
     <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V10_0__mail_history.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V11_0__child_activities.sql" dialect="MariaDB" />
     <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V1_0__init.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V2_0__kindergarten_account.sql" dialect="GenericSQL" />
-    <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V3_0__kindergarten.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V2_0__kindergarten.sql" dialect="MariaDB" />
+    <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V3_0__kindergarten_account.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V4_0__activity.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V5_0__group.sql" dialect="GenericSQL" />
     <file url="file://$PROJECT_DIR$/KindergartenBillApp/src/main/resources/db/migration/V6_0__parent.sql" dialect="GenericSQL" />

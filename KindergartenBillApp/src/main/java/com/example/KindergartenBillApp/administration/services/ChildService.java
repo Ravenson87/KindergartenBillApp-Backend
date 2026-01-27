@@ -196,6 +196,7 @@ public class ChildService {
      */
     @Transactional
     public Child addActivitiesToChild(Integer childId, Set<Integer> activitiesId) {
+        //TODO ubaci proveru za unique constraint koji je (child_id, activity_id)
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new ApiExceptions("Child with id " + childId + " not found", HttpStatus.NOT_FOUND));
         Set<Activity> activities = new HashSet<>();

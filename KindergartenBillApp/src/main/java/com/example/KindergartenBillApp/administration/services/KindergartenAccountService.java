@@ -1,7 +1,9 @@
 package com.example.KindergartenBillApp.administration.services;
 
+import com.example.KindergartenBillApp.administration.model.Kindergarten;
 import com.example.KindergartenBillApp.administration.model.KindergartenAccount;
 import com.example.KindergartenBillApp.administration.repository.KindergartenAccountRepository;
+import com.example.KindergartenBillApp.administration.repository.KindergartenRepository;
 import com.example.KindergartenBillApp.sharedTools.exceptions.ApiExceptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,7 @@ import org.springframework.stereotype.Service;
 public class KindergartenAccountService {
 
     private final KindergartenAccountRepository kindergartenAccountRepository;
+    private final KindergartenRepository kindergartenRepository;
 
     /**
      * Creates a new KindergartenAccount in the database.
@@ -26,13 +29,20 @@ public class KindergartenAccountService {
      * @return the saved KindergartenAccount with a generated ID
      */
     public KindergartenAccount create(KindergartenAccount model){
+        if(model.getKindergarten() == null || model.getKindergarten().getId() == null){
+            throw new ApiExceptions("Kindegarten id must be provided", HttpStatus.BAD_REQUEST);
+        }
+
+        Integer kindergartenId = model.getKindergarten().getId();
+        Kindergarten kindergarten = kindergartenRepository.findById(kindergartenId).orElseThrow(() -> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
+
         if(kindergartenAccountRepository.existsByAccountNumber(model.getAccountNumber()) ){
             throw new ApiExceptions("Account number already exists", HttpStatus.CONFLICT);
         }
         if(kindergartenAccountRepository.existsByIdentificationNumber(model.getIdentificationNumber())){
             throw new ApiExceptions("Identification number already exists", HttpStatus.CONFLICT);
         }
-
+            model.setKindergarten(kindergarten);
             return kindergartenAccountRepository.save(model);
 
     }
@@ -99,6 +109,12 @@ public class KindergartenAccountService {
     public KindergartenAccount update(KindergartenAccount model, Integer id){
       KindergartenAccount existing =kindergartenAccountRepository.findById(id)
               .orElseThrow(() -> new ApiExceptions("Kindergarten account with id = " + id + " not found", HttpStatus.NOT_FOUND));
+
+      if(model.getKindergarten() != null && model.getKindergarten().getId() != null){
+          Kindergarten kindergarten = kindergartenRepository.findById(model.getKindergarten().getId())
+                  .orElseThrow(() ->new ApiExceptions("Kindergarten with id " + model.getKindergarten().getId() + " not found", HttpStatus.NOT_FOUND));
+          existing.setKindergarten(kindergarten);
+      }
 
       if(model.getAccountNumber() != null
               && !model.getAccountNumber().equals(existing.getAccountNumber())
