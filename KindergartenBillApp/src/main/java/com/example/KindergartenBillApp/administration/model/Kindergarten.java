@@ -61,7 +61,6 @@ public class Kindergarten extends Auditable implements Serializable {
     @Column(name = "email", nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "logo can not be empty or null")
     @JsonProperty("logo")
     @Column(name = "logo")
     private String logo;
