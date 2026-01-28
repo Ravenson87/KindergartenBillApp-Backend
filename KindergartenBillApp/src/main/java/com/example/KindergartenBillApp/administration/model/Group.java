@@ -25,7 +25,7 @@ import java.util.Set;
 @ToString
 @Entity
 @JsonInclude(JsonInclude.Include.USE_DEFAULTS)
-@Table(name = "group")
+@Table(name = "groups")
 public class Group extends Auditable implements Serializable {
 
     @Id

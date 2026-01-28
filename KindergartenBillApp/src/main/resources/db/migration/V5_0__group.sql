@@ -1,4 +1,4 @@
-CREATE TABLE `group`(
+CREATE TABLE `groups`(
     `id` INT(11) NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(255) NOT NULL,
     `price` DECIMAL(10,2) NOT NULL,

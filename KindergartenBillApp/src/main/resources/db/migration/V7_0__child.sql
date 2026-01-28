@@ -14,7 +14,7 @@ CREATE TABLE `child`(
     `last_modified_date` DATETIME      DEFAULT NULL,
     PRIMARY KEY (`id`) USING BTREE,
     UNIQUE KEY `child_uq`  (`name`, `surname`, `parent_id`),
-    CONSTRAINT `fk_child_group` FOREIGN KEY (`group_id`) REFERENCES `group`(`id`)
+    CONSTRAINT `fk_child_group` FOREIGN KEY (`group_id`) REFERENCES `groups`(`id`)
                     ON UPDATE CASCADE ON DELETE NO ACTION,
     CONSTRAINT `fk_child_kindergarten` FOREIGN KEY (`kindergarten_id`) REFERENCES kindergarten(`id`)
                     ON UPDATE CASCADE ON DELETE NO ACTION,
