@@ -5,7 +5,7 @@ CREATE TABLE `kindergarten`
     `address`            VARCHAR(255) NOT NULL,
     `phone_number`       VARCHAR(20)  DEFAULT NULL,
     `email`              VARCHAR(255) NOT NULL,
-    `logo`               VARCHAR(255) NOT NULL,
+    `logo`               VARCHAR(255) DEFAULT NULL,
     `created_by`         VARCHAR(255) DEFAULT NULL,
     `last_modified_by`   VARCHAR(255) DEFAULT NULL,
     `created_date`       DATETIME     DEFAULT NULL,
