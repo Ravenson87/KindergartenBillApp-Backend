@@ -63,7 +63,7 @@ public class Kindergarten extends Auditable implements Serializable {
 
     @NotBlank(message = "logo can not be empty or null")
     @JsonProperty("logo")
-    @Column(name = "logo",  nullable = false)
+    @Column(name = "logo")
     private String logo;
 
     @ManyToMany(fetch = FetchType.LAZY)
