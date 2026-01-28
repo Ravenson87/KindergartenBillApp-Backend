@@ -67,7 +67,7 @@ public class Kindergarten extends Auditable implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
-            name = "kindergarten_group",
+            name = "kindergarten_groups",
             joinColumns = @JoinColumn(name = "kindergarten_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
