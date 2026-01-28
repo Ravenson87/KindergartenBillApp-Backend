@@ -77,5 +77,28 @@ public class Kindergarten extends Auditable implements Serializable {
     private Set<Group> group = new HashSet<>();
 
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "kindergarten_activity",
+            joinColumns = @JoinColumn(name = "kindergarten_id"),
+            inverseJoinColumns = @JoinColumn(name = "activity_id")
+    )
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ToString.Exclude
+    private Set<Activity> activities = new HashSet<>();
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) return true;
+        if (!(o instanceof Kindergarten)) return false;
+        Kindergarten other = (Kindergarten) o;
+        return id != null && id.equals(other.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : getClass().hashCode();
+    }
 
 }

@@ -1,7 +1,9 @@
 package com.example.KindergartenBillApp.administration.services;
 
+import com.example.KindergartenBillApp.administration.model.Activity;
 import com.example.KindergartenBillApp.administration.model.Group;
 import com.example.KindergartenBillApp.administration.model.Kindergarten;
+import com.example.KindergartenBillApp.administration.repository.ActivityRepository;
 import com.example.KindergartenBillApp.administration.repository.GroupRepository;
 import com.example.KindergartenBillApp.administration.repository.KindergartenRepository;
 import com.example.KindergartenBillApp.sharedTools.exceptions.ApiExceptions;
@@ -22,6 +24,8 @@ public class KindergartenService {
 
     private final KindergartenRepository kindergartenRepository;
     private final GroupRepository groupRepository;
+    private final ActivityRepository activityRepository;
+
 
     /**
      * Creates a new Kindergarten entity and associates it with an existing KindergartenAccount.
@@ -156,21 +160,34 @@ public class KindergartenService {
      * <p>This method retrieves the kindergarten by its ID, then looks up all groups
      * based on the provided IDs and adds them to the kindergarten's group set.
      * Existing groups remain associated with the kindergarten. If the kindergarten
-     * or any of the groups cannot be found, an {@link ApiExceptions} is thrown.</p>
+     * or any of the groups cannot be found, an {@link ApiExceptions} is thrown.
+     * If the kindergarten already contains one of the specified groups,
+     * an {@link ApiExceptions} with status 409 Conflict is thrown.</p>
      *
      * @param kindergartenId the ID of the kindergarten to which groups should be added
      * @param groupIds       a set of group IDs to be associated with the kindergarten
      * @return the updated {@link Kindergarten} entity with the newly added groups
-     * @throws ApiExceptions if the kindergarten or any group cannot be found
+     * @throws ApiExceptions if the kindergarten or any group cannot be found,
+     *                       or if a duplicate group is detected
      */
     @Transactional
     public Kindergarten addGroupsToKindergarten(Integer kindergartenId, Set<Integer> groupIds){
-        //TODO Ubaci proveru za unique constraint koji je (kindergarten_id, group_id)
+
         Kindergarten kindergarten = kindergartenRepository.findById(kindergartenId)
                 .orElseThrow(()-> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
         Set<Group> groups = new HashSet<>();
+        for(Integer groupId : groupIds){
+            Group group = groupRepository.findById(groupId)
+                    .orElseThrow(()-> new ApiExceptions("Group with id " + groupId + " not found", HttpStatus.NOT_FOUND));
 
-        groupIds.forEach(id -> groups.add(groupRepository.findById(id).orElseThrow(()-> new ApiExceptions("Group with id " + id + " not found", HttpStatus.NOT_FOUND))));
+            //Provera da li ima duplikata
+            if(kindergarten.getGroup().contains(group)){
+                throw new ApiExceptions("Kindergarten with id " + kindergartenId + " already contains group with id " + groupId , HttpStatus.CONFLICT);
+            }
+
+            groups.add(group);
+        }
+
         kindergarten.getGroup().addAll(groups);
         return kindergartenRepository.save(kindergarten);
     }
@@ -215,6 +232,86 @@ public class KindergartenService {
                 .orElseThrow(()-> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
 
         kindergarten.getGroup().clear();
+        return kindergartenRepository.save(kindergarten);
+    }
+
+    /**
+     * Adds one or more activities to a kindergarten without removing existing ones.
+     *
+     * <p>This method retrieves the kindergarten by its ID, then looks up all activities
+     * based on the provided IDs and adds them to the kindergarten's activity set.
+     * Existing activities remain associated with the kindergarten. If the kindergarten
+     * or any of the activities cannot be found, an {@link ApiExceptions} is thrown.
+     * If the kindergarten already contains one of the specified activities,
+     * an {@link ApiExceptions} with status 409 Conflict is thrown.</p>
+     *
+     * @param kindergartenId the ID of the kindergarten to which activities should be added
+     * @param activityIds    a set of activity IDs to be associated with the kindergarten
+     * @return the updated {@link Kindergarten} entity with the newly added activities
+     * @throws ApiExceptions if the kindergarten or any activity cannot be found,
+     *                       or if a duplicate activity is detected
+     */
+    @Transactional
+    public Kindergarten addActivityToKindergarten(Integer kindergartenId, Set<Integer> activityIds){
+        Kindergarten kindergarten = kindergartenRepository.findById(kindergartenId)
+                .orElseThrow(()-> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
+
+        Set<Activity> activities = new HashSet<>();
+
+        for(Integer activityId : activityIds){
+            Activity activity = activityRepository.findById(activityId)
+                    .orElseThrow(()-> new ApiExceptions("Activity with id " + activityId + " not found", HttpStatus.NOT_FOUND));
+
+            if(kindergarten.getActivities().contains(activity)){
+                throw new ApiExceptions("Kindergarten with id " + kindergartenId + " already contains activity with id " + activityId, HttpStatus.CONFLICT);
+            }
+            activities.add(activity);
+        }
+        kindergarten.getActivities().addAll(activities);
+        return kindergartenRepository.save(kindergarten);
+    }
+
+    /**
+     * Removes one or more activities from a kindergarten.
+     *
+     * <p>This method retrieves the kindergarten by its ID, then looks up all activities
+     * based on the provided IDs and removes them from the kindergarten's activity set.
+     * If the kindergarten or any of the activities cannot be found, an {@link ApiExceptions}
+     * is thrown.</p>
+     *
+     * @param kindergartenId the ID of the kindergarten from which activities should be removed
+     * @param activityIds    a set of activity IDs to be removed from the kindergarten
+     * @return the updated {@link Kindergarten} entity without the removed activities
+     * @throws ApiExceptions if the kindergarten or any activity cannot be found
+     */
+    @Transactional
+    public Kindergarten removeActivityFromKindergarten(Integer kindergartenId, Set<Integer> activityIds){
+        Kindergarten kindergarten = kindergartenRepository.findById(kindergartenId)
+                .orElseThrow(()-> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
+
+        activityIds.forEach(id -> kindergarten.getActivities().remove(activityRepository.findById(id)
+                .orElseThrow(()-> new ApiExceptions("Activity with id " + id + " not found", HttpStatus.NOT_FOUND))));
+
+        return kindergartenRepository.save(kindergarten);
+    }
+
+    /**
+     * Clears all activities associated with a kindergarten.
+     *
+     * <p>This method retrieves the kindergarten by its ID and removes all activities
+     * from its activity set. If the kindergarten cannot be found, an {@link ApiExceptions}
+     * is thrown.</p>
+     *
+     * @param kindergartenId the ID of the kindergarten whose activities should be cleared
+     * @return the updated {@link Kindergarten} entity without any activities
+     * @throws ApiExceptions if the kindergarten cannot be found
+     */
+    @Transactional
+    public Kindergarten clearActivitiesFromKindergarten(Integer kindergartenId){
+        Kindergarten kindergarten = kindergartenRepository.findById(kindergartenId)
+                .orElseThrow(()-> new ApiExceptions("Kindergarten with id " + kindergartenId + " not found", HttpStatus.NOT_FOUND));
+
+        kindergarten.getActivities().clear();
         return kindergartenRepository.save(kindergarten);
     }
 }

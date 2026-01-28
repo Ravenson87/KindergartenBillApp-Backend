@@ -187,21 +187,31 @@ public class ChildService {
      * <p>This method retrieves the child by its ID, then looks up all activities
      * based on the provided IDs and adds them to the child's activity set.
      * If the child or any of the activities cannot be found, an {@link ApiExceptions}
-     * is thrown.</p>
+     * is thrown. If the child already has one of the specified activities,
+     * an {@link ApiExceptions} with status 409 Conflict is thrown.</p>
      *
      * @param childId      the ID of the child to which activities should be added
      * @param activitiesId a set of activity IDs to be added
      * @return the updated {@link Child} entity with the newly added activities
-     * @throws ApiExceptions if the child or any activity cannot be found
+     * @throws ApiExceptions if the child or any activity cannot be found,
+     *                       or if a duplicate activity is detected
      */
     @Transactional
     public Child addActivitiesToChild(Integer childId, Set<Integer> activitiesId) {
-        //TODO ubaci proveru za unique constraint koji je (child_id, activity_id)
+
         Child child = childRepository.findById(childId)
                 .orElseThrow(() -> new ApiExceptions("Child with id " + childId + " not found", HttpStatus.NOT_FOUND));
         Set<Activity> activities = new HashSet<>();
-        activitiesId.forEach(id -> activities.add(activityRepository.findById(id)
-                .orElseThrow(() -> new ApiExceptions("Activity with id " + id + " not found", HttpStatus.NOT_FOUND))));
+        for (Integer activityId : activitiesId) {
+            Activity activity = activityRepository.findById(activityId)
+                    .orElseThrow(() -> new ApiExceptions("Activity id " + activityId + " not found", HttpStatus.NOT_FOUND));
+            //Provera da li child vec sadrzi ovu aktivnost
+            if(child.getActivities().contains(activity)){
+                throw new ApiExceptions("Child with id " + childId + " already has activity with id " + activityId, HttpStatus.CONFLICT);
+            }
+            activities.add(activity);
+        }
+
         child.getActivities().addAll(activities);
         return childRepository.save(child);
     }
