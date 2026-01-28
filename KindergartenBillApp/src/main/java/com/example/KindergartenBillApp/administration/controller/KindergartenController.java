@@ -1,6 +1,7 @@
 package com.example.KindergartenBillApp.administration.controller;
 
 import com.example.KindergartenBillApp.administration.model.Kindergarten;
+import com.example.KindergartenBillApp.administration.model.dto.ActivitiesIdsDto;
 import com.example.KindergartenBillApp.administration.model.dto.GroupsIdsDto;
 import com.example.KindergartenBillApp.administration.services.KindergartenService;
 import jakarta.validation.Valid;
@@ -221,5 +222,83 @@ public class KindergartenController {
 
         return ResponseEntity.status(HttpStatus.OK).body(kindergartenService.clearGroupsFromKindergarten(kindergartenId));
     }
+
+    /**
+     * Adds one or more activities to a kindergarten without removing existing ones.
+     * This endpoint retrieves the kindergarten by its ID, then looks up all activities
+     * based on the provided IDs and adds them to the kindergarten's activity set.
+     * Each activity ID is validated individually through ActivitiesIdsDto.
+     * If the kindergarten or any of the activities cannot be found, the service throws
+     * ApiExceptions with the appropriate HTTP status code.
+     * If the kindergarten already contains one of the specified activities,
+     * an ApiExceptions with status 409 Conflict is thrown.
+     *
+     * @param kindergartenId the unique identifier of the kindergarten (must be >= 1)
+     * @param groupsIds      a set of activity IDs to be added to the kindergarten
+     * @return ResponseEntity containing the updated Kindergarten entity and HTTP status 200 OK
+     */
+    @PostMapping("{kindergartenId}/activities")
+    public ResponseEntity<Kindergarten> addActivitiesToKindergarten(
+            @PathVariable
+            @NotNull(message = "id can not be null")
+            @Min(value = 1, message = "id must be greater then zero")
+            Integer kindergartenId,
+            @RequestBody
+            Set<@Valid ActivitiesIdsDto> groupsIds
+    ){
+        Set<Integer> ids = groupsIds.stream()
+                .map(ActivitiesIdsDto::getActivitiesId)
+                .collect(Collectors.toSet());
+        return ResponseEntity.status(HttpStatus.OK).body(kindergartenService.addActivityToKindergarten(kindergartenId, ids));
+    }
+
+    /**
+     * Removes one or more activities from a kindergarten.
+     * This endpoint retrieves the kindergarten by its ID, then looks up all activities
+     * based on the provided IDs and removes them from the kindergarten's activity set.
+     * Each activity ID is validated individually through ActivitiesIdsDto.
+     * If the kindergarten or any of the activities cannot be found, the service throws
+     * ApiExceptions with the appropriate HTTP status code.
+     *
+     * @param kindergartenId the unique identifier of the kindergarten (must be >= 1)
+     * @param groupsIds      a set of activity IDs to be removed from the kindergarten
+     * @return ResponseEntity containing the updated Kindergarten entity without the removed activities and HTTP status 200 OK
+     */
+    @DeleteMapping("{kindergartenId}/activities")
+    public ResponseEntity<Kindergarten> removeActivitiesFromKindergarten(
+            @PathVariable
+            @NotNull(message = "id can not be null")
+            @Min(value = 1, message = "id must be greater then zero")
+            Integer kindergartenId,
+            @RequestBody
+            Set<@Valid ActivitiesIdsDto> groupsIds
+    ){
+
+        Set<Integer> ids = groupsIds.stream()
+                .map(ActivitiesIdsDto::getActivitiesId)
+                .collect(Collectors.toSet());
+        return ResponseEntity.status(HttpStatus.OK).body(kindergartenService.removeActivityFromKindergarten(kindergartenId, ids));
+    }
+
+    /**
+     * Clears all activities associated with a kindergarten.
+     * This endpoint retrieves the kindergarten by its ID and removes all activities
+     * from its activity set. If the kindergarten cannot be found, the service throws
+     * ApiExceptions with status 404 Not Found.
+     *
+     * @param kindergartenId the unique identifier of the kindergarten (must be >= 1)
+     * @return ResponseEntity containing the updated Kindergarten entity without any activities and HTTP status 200 OK
+     */
+    @DeleteMapping("{kindergartenId}/activities/clear")
+    public ResponseEntity<Kindergarten> clearActivitiesFromKindergarten(
+            @PathVariable
+            @NotNull(message = "id can not be null")
+            @Min(value = 1, message = "id must be greater then zero")
+            Integer kindergartenId){
+
+        return ResponseEntity.status(HttpStatus.OK).body(kindergartenService.clearActivitiesFromKindergarten(kindergartenId));
+    }
+
+
 
 }
